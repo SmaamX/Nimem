@@ -67,11 +67,14 @@ iterator enumProcesses*: Process =
   var p: Process
   when defined(linux):
     checkRoot()
-    let allFiles = toSeq(walkDir("/proc", relative = true))
-    for pid in mapIt(filterIt(allFiles, isDigit(it.path[0])), parseInt(it.path)):
-        p.pid = pid
-        p.name = readFile(fmt"/proc/{pid}/comm").strip()
-        yield p
+    try:
+      let allFiles = toSeq(walkDir("/proc", relative = true))
+      for pid in mapIt(filterIt(allFiles, isDigit(it.path[0])), parseInt(it.path)):
+          p.pid = pid
+          p.name = readFile(fmt"/proc/{pid}/comm").strip()
+          yield p
+    except:
+      discard
   elif defined(windows):
     var 
       pe: PROCESSENTRY32
