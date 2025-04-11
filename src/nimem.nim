@@ -306,12 +306,15 @@ proc aob(pattern: string, byteBuffer: seq[byte], single: bool): seq[ByteAddress]
   let bytePattern = patternToBytes(pattern)
   for curIndex, _ in byteBuffer:
     for sigIndex, s in bytePattern:
-      if byteBuffer[curIndex + sigIndex] != s and s != wildCardByte:
-        break
-      elif sigIndex == bytePattern.len-1:
-        result.add(curIndex)
-        if single:
-          return
+      try:
+        if byteBuffer[curIndex + sigIndex] != s and s != wildCardByte:
+          break
+        elif sigIndex == bytePattern.len-1:
+          result.add(curIndex)
+          if single:
+            return
+          break
+      except IndexDefect:
         break
 
 proc aobScanModule*(process: Process, moduleName, pattern: string, relative: bool = false, single: bool = true): seq[ByteAddress] =
